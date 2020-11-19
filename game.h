@@ -25,6 +25,12 @@ namespace game {
     }
 
     template<typename T>
+    struct Collider {
+        T top;
+        T botton
+    };
+
+    template<typename T>
     struct Vector2
     {
         T x;
