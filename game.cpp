@@ -5,6 +5,7 @@
 
 #include "game.h"
 
+
 game::GameObject::GameObject() {
     pos.x = -1; pos.y = -1;
     // vel.x = 0; vel.y = 0;
@@ -33,7 +34,16 @@ void game::SceneController::game_over() {
     while (true) {void;}
 }
 
-void game::SceneController::step_scene() {
+void game::SceneController::start_scene()
+{
+    last_step_time = millis();
+    for (int i = 0; i < TOTAL_GAME_OBJECTS; i++) {
+        scene_objects[i]->start();
+    }
+}
+
+void game::SceneController::step_scene()
+{
 
     unsigned long current_time = millis();
     unsigned long l_dt = current_time - last_step_time;
@@ -46,9 +56,44 @@ void game::SceneController::step_scene() {
     last_step_time = current_time;
 }
 
-float abs(const float &x) {
-    if (x < 0.0) { return x * -1.0; }
-    return x;
+// #ifndef ARDUINO_H
+// float abs(const float &x) {
+//     if (x < 0.0) { return x * -1.0; }
+//     return x;
+// }
+// #endif
+
+bool game::objects_intersecting(game::GameObject* obj_a, game::GameObject* obj_b)
+{
+    // b1.top < b2.bottom // b1 below b2
+    // || b2.top < b1.bottom // b2 below b1
+    // || b1.right < b2.left // b2 to the right of b1
+    // || b2.right < b1.left
+    game::RelativeCollider<float> a;
+        a.top    = obj_a->pos.y + obj_a->collider.top;
+        a.bottom = obj_a->pos.y + obj_a->collider.bottom;
+        a.left   = obj_a->pos.x + obj_a->collider.left;
+        a.right  = obj_a->pos.x + obj_a->collider.right;
+    game::RelativeCollider<float> b;
+        b.top    = obj_b->pos.y + obj_b->collider.top;
+        b.bottom = obj_b->pos.y + obj_b->collider.bottom;
+        b.left   = obj_b->pos.x + obj_b->collider.left;
+        b.right  = obj_b->pos.x + obj_b->collider.right;   
+
+    bool disjoint = a.top < b.bottom
+        || b.top < a.bottom
+        || a.right < b.left
+        || b.right < a.left;
+    
+    return !disjoint;
+}
+
+void game::Player::start()
+{
+    collider.top    =  1.0;
+    collider.bottom = -1.0;
+    collider.right  =  1.0;
+    collider.left   = -1.0;
 }
 
 void game::Player::physics_update(const float &delta_time)
@@ -73,6 +118,37 @@ void game::Player::physics_update(const float &delta_time)
     }
 }
 
-void setup() {
-
+void game::Player::render()
+{
+    // Execute the render calls
 }
+
+
+void game::Obstacle::start()
+{
+    collider.top    =  1.0;
+    collider.bottom = -1.0;
+    collider.right  =  1.0;
+    collider.left   = -1.0;
+
+    vel.x = -1.0;
+}
+
+void game::Obstacle::physics_update(const float &delta_time)
+{
+    if (pos.x < -2.0) {
+        respawn();
+    }
+}
+
+void game::Obstacle::respawn()
+{
+    pos.x = 10.0; // Should be random
+}
+
+void game::Obstacle::render() 
+{
+    // Execute the render calls
+}
+
+

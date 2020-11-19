@@ -8,6 +8,12 @@
 
 #ifndef ARDUINO_H
 unsigned long millis();
+long random(int, int);
+long random();
+#endif
+
+#ifdef ARDUINO_H
+inline float frandom() { return random(1, 500) / 100.0; }
 #endif
 
 namespace game {
@@ -25,9 +31,14 @@ namespace game {
     }
 
     template<typename T>
-    struct Collider {
+    struct RelativeCollider
+    {
         T top;
-        T botton
+        T bottom;
+        T left;
+        T right;
+        RelativeCollider() { }
+        RelativeCollider(T a, T b, T c, T d) : top(a), bottom(b), left(c), right(d) { }
     };
 
     template<typename T>
@@ -86,10 +97,11 @@ namespace game {
     {
         Vector2<float> pos; // possition
         Vector2<float> vel; // velocity
+        RelativeCollider<float> collider;
         GameObject();
-        virtual void start();
+        virtual void start() = 0;
         virtual void physics_update(const float &delta_time) = 0;
-        virtual void render();
+        virtual void render() = 0;
     };
 
     struct Player: public GameObject
@@ -104,7 +116,10 @@ namespace game {
         void start() override;
         void physics_update(const float &delta_time) override;
         void render() override;
+        void respawn();
     };
+
+    bool objects_intersecting(GameObject* obj_a, GameObject* obj_b);
 
     #define MAX_OBSTACLES 6
     #define TOTAL_GAME_OBJECTS MAX_OBSTACLES+1
