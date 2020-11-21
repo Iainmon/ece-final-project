@@ -142,7 +142,7 @@ namespace game {
 
     bool objects_intersecting(GameObject* obj_a, GameObject* obj_b);
 
-    #define MAX_OBSTACLES 3
+    #define MAX_OBSTACLES 5
     #define TOTAL_GAME_OBJECTS MAX_OBSTACLES+1
 
     class SceneController

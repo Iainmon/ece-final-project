@@ -112,10 +112,10 @@ bool game::objects_intersecting(game::GameObject* obj_a, game::GameObject* obj_b
 
 void game::Player::start()
 {
-    collider.top    =  6.0;
-    collider.bottom =  0.0;
-    collider.right  =  0.1;
-    collider.left   = -0.1;
+    collider.top    =  5.0;
+    collider.bottom =  2.0;
+    collider.right  =  2.0;
+    collider.left   = 2.1;
     pos.x = 100.0;
     pos.y = 0.0;
 }
@@ -182,10 +182,10 @@ void game::Player::render()
 
 void game::Obstacle::start()
 {
-    collider.top    =  5.0;
-    collider.bottom = -5.0;
-    collider.right  =  5.0;
-    collider.left   = -5.0;
+    collider.top    =  3.0;
+    collider.bottom = -3.0;
+    collider.right  =  3.0;
+    collider.left   = -3.0;
 
 
     pos.y = (float)random(0, 30);
@@ -215,6 +215,6 @@ void game::Obstacle::render()
     // https://github.com/olikraus/u8g2/wiki/fntgrpx11#cursor
     constexpr uint16_t box_glyph_addy = 0x50;
     // game::graphics::draw_frame(pos.x, pos.y, 8, 8);
-    game::graphics::draw_glyph(pos.x - 2.5f, pos.y - 2.5f, box_glyph_addy);
+    game::graphics::draw_glyph(pos.x - 6.0f, pos.y + 6.0f, box_glyph_addy); // Glyphs draw differently
 }
 
