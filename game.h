@@ -120,11 +120,15 @@ namespace game {
 
     struct Player: public GameObject
     {
+        enum StateMarkov {jogging, airborn, ducking} action_markov;
+
         timestamp_t animation_schedule;
         uint8_t animation_frame_selector;
-        bool airborn;
+        // bool airborn;
+        // bool ducking;
         inline void jump();
         inline void squat();
+        inline void run();
 
         void start() override;
         void physics_update(const float &delta_time) override;
@@ -141,7 +145,7 @@ namespace game {
 
     bool objects_intersecting(GameObject* obj_a, GameObject* obj_b);
 
-    #define MAX_OBSTACLES 5
+    #define MAX_OBSTACLES 4
     #define TOTAL_GAME_OBJECTS MAX_OBSTACLES+1
 
     class SceneController

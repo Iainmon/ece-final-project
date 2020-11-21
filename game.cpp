@@ -125,18 +125,45 @@ void game::Player::start()
     collider.top    =  12.0;
     collider.bottom =  4.0;
     collider.right  =  1.0;
-    collider.left   = 2.0;
+    collider.left   =  2.0;
     pos.x = 120.0;
     pos.y = 0.0;
+
+    action_markov = jogging;
 }
 
 void game::Player::physics_update(const float &delta_time)
 {
     Vector2<float> gravity_force = Vector2<float>(0.0, -20.0);
 
+    // if (action_markov == jogging) {
+    //     if (game::user_input::jump) {
+    //         jump();
+    //         game::user_input::jump = false;
+    //     } else if (game::user_input::squat) {
+    //         squat();
+    //         // game::user_input::squat = false;
+    //     }
+    // } else if (action_markov == ducking) {
+    //     if (!game::user_input::squat) {
+    //         run();
+    //     }
+    // }
+
     if (game::user_input::jump) {
+        // Markov edge (e) solution
+        if (game::user_input::squat) {
+            game::user_input::squat = false;
+            run();
+        }
+        
+        // Normal jump functionality
         jump();
         game::user_input::jump = false;
+    } else if (game::user_input::squat) {
+        squat();
+    } else if (action_markov != airborn && !game::user_input::squat) {
+        run();
     }
 
     pos += vel * delta_time;
@@ -145,9 +172,7 @@ void game::Player::physics_update(const float &delta_time)
         // Apply gravity
         vel += gravity_force * delta_time;
     } else if (pos.y < 0.0) {
-        vel.y = 0.0;
-        pos.y = 0.0;
-        airborn = false;
+        run();
     }
 
     constexpr float max_axis_movement_speed = 20.0;
@@ -155,13 +180,31 @@ void game::Player::physics_update(const float &delta_time)
     // vel.x = constrain(vel.x, -max_axis_movement_speed, max_axis_movement_speed);
 }
 
+void game::Player::run()
+{
+    //if () {
+        vel.y = 0.0;
+        pos.y = 0.0;
+        collider.top = 12.0;
+        action_markov = jogging;
+    //}
+}
+
 void game::Player::jump()
 {
-    Vector2<float> jump_force    = Vector2<float>(0.0, 20.0);
+    Vector2<float> jump_force = Vector2<float>(0.0, 20.0);
 
-    if (!airborn) {
+    if (action_markov == jogging) {
         vel += jump_force * 2;
-        airborn = true;
+        action_markov = airborn;
+    }
+}
+
+void game::Player::squat()
+{
+    if (action_markov == jogging) {
+        collider.top -= 4.0;
+        action_markov = ducking;
     }
 }
 
@@ -172,12 +215,16 @@ void game::Player::render()
     constexpr float animation_durration_seconds = 0.2;
     constexpr unsigned long animation_durration_millis = (unsigned long)(1000.0 * animation_durration_seconds);
 
-    if (airborn) {
+    if (action_markov == airborn) {
         animation_frame_selector = 2;
-    } else if (animation_schedule < game::game_state::life_time) {
-        ++animation_frame_selector;
-        animation_frame_selector %= 2;
-        animation_schedule = game::game_state::life_time + animation_durration_millis;
+    } else if (action_markov == ducking) {
+        animation_frame_selector = 3;
+    } else if (action_markov == jogging) {
+        if (animation_schedule < game::game_state::life_time) {
+            ++animation_frame_selector;
+            animation_frame_selector %= 2;
+            animation_schedule = game::game_state::life_time + animation_durration_millis;
+        }
     }
 
     game::graphics::draw_bitmap(pos.x - 3.5, pos.y, 1, 12, game::graphics::sprites::person_run_frames[animation_frame_selector]);

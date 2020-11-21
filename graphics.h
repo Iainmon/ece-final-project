@@ -115,8 +115,8 @@ namespace graphics_implementation {
 
     namespace sprites
     {
-        static const byte_t person_run_frames[3][12] = {
-        {
+        static const byte_t person_run_frames[4][12] = {
+        {           // Running 1
             B00000000,
             B00111000,
             B00111000,
@@ -144,7 +144,7 @@ namespace graphics_implementation {
             // B00000000,
 
         },
-        {
+        {           // Running 2
             B00000000,
             B00111000,
             B00111000,
@@ -171,7 +171,7 @@ namespace graphics_implementation {
             // B00111000,
             // B00000000,
         },
-        {
+        {           // Jump
             B00000000,
             B00111000,
             B00111000,
@@ -184,6 +184,20 @@ namespace graphics_implementation {
             B01101100,
             B10000000,
             B00000000,
+        },
+        {           // Duck
+            B00000000,
+            B00000000,
+            B00000000,
+            B00000000,
+            B00111000,
+            B01111100,
+            B01111100,
+            B01010100,
+            B00111000,
+            B00111000,
+            B00101000,
+            B00101000,
         }
         };
 
@@ -222,6 +236,8 @@ namespace graphics_implementation {
             reverse_all_bytes(person_run_frames[1], 12);
             reverse_array(person_run_frames[2], 0, 12);
             reverse_all_bytes(person_run_frames[2], 12);
+            reverse_array(person_run_frames[3], 0, 12);
+            reverse_all_bytes(person_run_frames[3], 12);
         }
     }
 }

@@ -15,7 +15,7 @@ void game::user_input::did_jump_interrupt() {
 }
 
 void game::user_input::did_squat_interrupt() {
-    game::user_input::squat = true;
+    game::user_input::squat = !game::user_input::squat;
 }
 
 static game::SceneController game_scene;
@@ -33,6 +33,8 @@ void setup()
     // game::graphics::initial_refresh();
 
     attachInterrupt(digitalPinToInterrupt(JUMP_BUTTON), game::user_input::did_jump_interrupt, RISING);
+    attachInterrupt(digitalPinToInterrupt(SQUAT_BUTTON), game::user_input::did_squat_interrupt, CHANGE);
+    // attachInterrupt(digitalPinToInterrupt(SQUAT_BUTTON), game::user_input::did_squat_interrupt, FALLING);
 
 }
 
