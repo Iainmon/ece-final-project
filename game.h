@@ -120,12 +120,11 @@ namespace game {
 
     struct Player: public GameObject
     {
-        //struct
-        //{
-            timestamp_t animation_schedule;
-            uint8_t animation_frame_selector;
-            bool airborn;
-        //} player_state;
+        timestamp_t animation_schedule;
+        uint8_t animation_frame_selector;
+        bool airborn;
+        inline void jump();
+        inline void squat();
 
         void start() override;
         void physics_update(const float &delta_time) override;
@@ -153,6 +152,7 @@ namespace game {
         unsigned long last_step_time;
         void game_over();
         bool game_is_over = false;
+        timestamp_t next_game_schedule;
         public:
         SceneController();
         void start_scene();

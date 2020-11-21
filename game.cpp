@@ -52,7 +52,10 @@ void game::SceneController::step_scene()
 
 
     if (game_is_over) {
-        game_over();
+        if (next_game_schedule < current_time) {
+            step_scene();
+            game_is_over = false;
+        }
         last_step_time = current_time; // Still update delta time. Things are still rendered at game over.
         return;
     }
@@ -64,6 +67,10 @@ void game::SceneController::step_scene()
     for (byte_t i = 0; i < MAX_OBSTACLES; ++i) {
         if (game::objects_intersecting(&player, &scene_obstacles[i])) {
             game_is_over = true;
+
+            constexpr timestamp_t game_over_delay_seconds = 5;
+            constexpr timestamp_t game_over_delay = game_over_delay_seconds * 1000;
+            next_game_schedule = current_time + game_over_delay;
             break;
         }
     }
@@ -75,6 +82,9 @@ void game::SceneController::render()
 {
     for (byte_t i = 0; i < TOTAL_GAME_OBJECTS; ++i) {
         scene_objects[i]->render();
+    }
+    if (game_is_over) {
+        game_over();
     }
 }
 
@@ -104,73 +114,67 @@ bool game::objects_intersecting(game::GameObject* obj_a, game::GameObject* obj_b
 
     bool disjoint = a.top < b.bottom
         || b.top < a.bottom
-        || a.right < b.left
-        || b.right < a.left;
+        || a.right > b.left
+        || b.right > a.left;
     
     return !disjoint;
 }
 
 void game::Player::start()
 {
-    collider.top    =  5.0;
-    collider.bottom =  2.0;
-    collider.right  =  2.0;
-    collider.left   = 2.1;
-    pos.x = 100.0;
+    collider.top    =  12.0;
+    collider.bottom =  4.0;
+    collider.right  =  1.0;
+    collider.left   = 2.0;
+    pos.x = 120.0;
     pos.y = 0.0;
 }
 
 void game::Player::physics_update(const float &delta_time)
 {
-    Vector2<float> gravity_force = Vector2<float>(0.0, -10.0);
-    Vector2<float> jump_force    = Vector2<float>(0.0, 6.0);
+    Vector2<float> gravity_force = Vector2<float>(0.0, -20.0);
 
-    Vector2<float> ground = Vector2<float>(0.0, 0.0);
-
-    if (game::user_input::jump) { // This should happen in the scene controller
-        vel += jump_force;
+    if (game::user_input::jump) {
+        jump();
         game::user_input::jump = false;
     }
 
     pos += vel * delta_time;
 
-
     if (pos.y > 0.2) {
-        vel += gravity_force * delta_time; // gravity_force;
+        // Apply gravity
+        vel += gravity_force * delta_time;
     } else if (pos.y < 0.0) {
         vel.y = 0.0;
         pos.y = 0.0;
+        airborn = false;
     }
 
     constexpr float max_axis_movement_speed = 20.0;
-    vel.y = constrain(vel.y, -max_axis_movement_speed, max_axis_movement_speed);
+    // vel.y = constrain(vel.y, -max_axis_movement_speed, max_axis_movement_speed);
     // vel.x = constrain(vel.x, -max_axis_movement_speed, max_axis_movement_speed);
+}
 
+void game::Player::jump()
+{
+    Vector2<float> jump_force    = Vector2<float>(0.0, 20.0);
 
-    // This the velocity to zero when the distance between player and the ground approches zero.
-    // Vector2<float> ground_diff = ground - pos;
-    // const float ground_diff_threshold = 0.15;
-    // if (abs(ground_diff.y) > ground_diff_threshold) {
-    //     vel.y = 0;
-    //     pos.y = 0;
-    // }
+    if (!airborn) {
+        vel += jump_force * 2;
+        airborn = true;
+    }
 }
 
 void game::Player::render()
 {
     // Execute the render calls
 
-    // game::graphics::draw_box(pos.x, pos.y, 3, 3);
-
-
-    // TODO: Implement jumping animation
-
-
     constexpr float animation_durration_seconds = 0.2;
     constexpr unsigned long animation_durration_millis = (unsigned long)(1000.0 * animation_durration_seconds);
 
-
-    if (animation_schedule < game::game_state::life_time) {
+    if (airborn) {
+        animation_frame_selector = 2;
+    } else if (animation_schedule < game::game_state::life_time) {
         ++animation_frame_selector;
         animation_frame_selector %= 2;
         animation_schedule = game::game_state::life_time + animation_durration_millis;
@@ -182,10 +186,10 @@ void game::Player::render()
 
 void game::Obstacle::start()
 {
-    collider.top    =  3.0;
-    collider.bottom = -3.0;
-    collider.right  =  3.0;
-    collider.left   = -3.0;
+    collider.top    =  5.5;
+    collider.bottom =  0.0;
+    collider.right  = -5.5;
+    collider.left   =  5.5;
 
 
     pos.y = (float)random(0, 30);

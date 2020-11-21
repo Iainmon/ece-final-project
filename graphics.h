@@ -115,7 +115,7 @@ namespace graphics_implementation {
 
     namespace sprites
     {
-        static const byte_t person_run_frames[2][12] = {
+        static const byte_t person_run_frames[3][12] = {
         {
             B00000000,
             B00111000,
@@ -170,6 +170,20 @@ namespace graphics_implementation {
             // B00111000,
             // B00111000,
             // B00000000,
+        },
+        {
+            B00000000,
+            B00111000,
+            B00111000,
+            B00111000,
+            B10010010,
+            B01111100,
+            B00111000,
+            B00111000,
+            B00110010,
+            B01101100,
+            B10000000,
+            B00000000,
         }
         };
 
@@ -206,6 +220,8 @@ namespace graphics_implementation {
             reverse_all_bytes(person_run_frames[0], 12);
             reverse_array(person_run_frames[1], 0, 12);
             reverse_all_bytes(person_run_frames[1], 12);
+            reverse_array(person_run_frames[2], 0, 12);
+            reverse_all_bytes(person_run_frames[2], 12);
         }
     }
 }

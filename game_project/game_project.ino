@@ -15,7 +15,7 @@ void game::user_input::did_jump_interrupt() {
 }
 
 void game::user_input::did_squat_interrupt() {
-    game::user_input::squat = !game::user_input::squat;
+    game::user_input::squat = true;
 }
 
 static game::SceneController game_scene;
@@ -26,7 +26,7 @@ game::Player* player = game_scene.expose_player();
 
 void setup()
 {
-    
+
     game::graphics::sprites::format_sprites();
     game::graphics::initialize_screens();
     game_scene.start_scene();
