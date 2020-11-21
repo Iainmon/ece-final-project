@@ -23,7 +23,9 @@ game::SceneController::SceneController() {
 void game::SceneController::game_over()
 {
     // TODO: render some animation and give controll back to UI
-    game::graphics::draw_string(100, 20, "GAME OVER!");
+    game::graphics::draw_string(120, 60, "GAME");
+    game::graphics::draw_string(120, 40, "OVER!");
+
 }
 
 void game::SceneController::start_scene()
@@ -36,16 +38,24 @@ void game::SceneController::start_scene()
 
 void game::SceneController::step_scene()
 {
-    if (game_is_over) {
-        game_over();
-        return;
-    }
-
     timestamp_t current_time = millis();
     game::game_state::life_time = current_time;
-    
     timestamp_t l_dt = current_time - last_step_time;
     float delta_time = (float)l_dt / 1000.0; // I want those seconds
+
+    // char buf[8];
+    // char buff[20];
+    // float in = delta_time;//* 1000.0f;
+    // sprintf(buf, dtostrf(in, 8, 5, "%f\0" ));
+    // sprintf(buff, "FPS: %s", buf);
+    // game::graphics::debug_draw_string(80, 60, buff);
+
+
+    if (game_is_over) {
+        game_over();
+        last_step_time = current_time; // Still update delta time. Things are still rendered at game over.
+        return;
+    }
 
     for (byte_t i = 0; i < TOTAL_GAME_OBJECTS; ++i) {
         scene_objects[i]->physics_update(delta_time);
@@ -152,8 +162,13 @@ void game::Player::render()
 
     // game::graphics::draw_box(pos.x, pos.y, 3, 3);
 
+
+    // TODO: Implement jumping animation
+
+
     constexpr float animation_durration_seconds = 0.2;
     constexpr unsigned long animation_durration_millis = (unsigned long)(1000.0 * animation_durration_seconds);
+
 
     if (animation_schedule < game::game_state::life_time) {
         ++animation_frame_selector;
@@ -161,7 +176,7 @@ void game::Player::render()
         animation_schedule = game::game_state::life_time + animation_durration_millis;
     }
 
-    game::graphics::draw_bitmap(pos.x, pos.y, 1, 12, game::graphics::sprites::person_run_frames[animation_frame_selector]);
+    game::graphics::draw_bitmap(pos.x - 3.5, pos.y, 1, 12, game::graphics::sprites::person_run_frames[animation_frame_selector]);
 }
 
 
@@ -197,8 +212,9 @@ void game::Obstacle::respawn()
 void game::Obstacle::render() 
 {
     // Execute the render calls
-    constexpr uint16_t snowman_glyph_addy = 0x2603;
-    game::graphics::draw_frame(pos.x, pos.y, 8, 8);
-    // game::graphics::draw_glyph(pos.x, pos.y, snowman_glyph_addy);
+    // https://github.com/olikraus/u8g2/wiki/fntgrpx11#cursor
+    constexpr uint16_t box_glyph_addy = 0x50;
+    // game::graphics::draw_frame(pos.x, pos.y, 8, 8);
+    game::graphics::draw_glyph(pos.x - 2.5f, pos.y - 2.5f, box_glyph_addy);
 }
 

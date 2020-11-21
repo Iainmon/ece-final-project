@@ -17,11 +17,12 @@ namespace graphics_implementation {
     static OLED_Display mini_display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
     static U8G2_ST7920_128X64_1_SW_SPI u8g2(/*rotation = U8G2_R0*/ U8G2_R2, /* clock=*/ 13, /* data=*/ 11, /* CS=*/ 12, /* reset=*/ 8);
 
-    // static const byte_t default_font_mode = u8g2_font_6x10_tf;
+    #define DEFAULT_FONT_MODE u8g2_font_tenstamps_mu // u8g2_font_6x10_tf;
+    #define DEBUG_FONT_MODE u8g2_font_5x8_mf
 
     void pre_update()
     {
-        u8g2.setFont(u8g2_font_6x10_tf);
+        u8g2.setFont(DEFAULT_FONT_MODE);
         u8g2.setFontRefHeightExtendedText();
         u8g2.setDrawColor(1);
         u8g2.setBitmapMode(1);
@@ -74,18 +75,24 @@ namespace graphics_implementation {
     {
         u8g2.drawStr(x, y, s);
     }
+    inline void debug_draw_string(u8g2_uint_t x, u8g2_uint_t y, const char *s)
+    {
+        u8g2.setFont(DEBUG_FONT_MODE);
+        u8g2.drawStr(x, y, s);
+        u8g2.setFont(DEFAULT_FONT_MODE);
+    }
 
     inline void draw_glyph(u8g2_uint_t x, u8g2_uint_t y, uint16_t encoding)
     {
         u8g2.drawGlyph(x, y, encoding);
     }
-    inline void draw_glyph(float &_x, float &_y, uint16_t encoding)
+    inline void draw_glyph(float _x, float _y, uint16_t encoding)
     {
+        u8g2.setFont(u8g2_font_cursor_tr);
         const u8g2_uint_t x = round(_x);
         const u8g2_uint_t y = round(_y);
-        // u8g2.setFont(u8g2_font_unifont_t_symbols);
-        // u8g2.drawGlyph(x, y, encoding);
-        // u8g2.setFont(u8g2_font_6x10_tf);
+        u8g2.drawGlyph(x, y, encoding);
+        u8g2.setFont(DEFAULT_FONT_MODE);
     }
 
     inline void draw_bitmap(float &_x, float &_y, u8g2_uint_t cnt, u8g2_uint_t h, const uint8_t *bitmap)
@@ -97,6 +104,12 @@ namespace graphics_implementation {
     inline void draw_bitmap(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t cnt, u8g2_uint_t h, const uint8_t *bitmap)
     {
         u8g2.drawBitmap(x, y, cnt, h, bitmap);
+    }
+
+
+    namespace messages {
+        const static char game_over_1[] = {"GAME"};
+        const static char game_over_2[] = {"OVER"};
     }
 
 

@@ -26,13 +26,13 @@ game::Player* player = game_scene.expose_player();
 
 void setup()
 {
+    
     game::graphics::sprites::format_sprites();
     game::graphics::initialize_screens();
     game_scene.start_scene();
     // game::graphics::initial_refresh();
 
     attachInterrupt(digitalPinToInterrupt(JUMP_BUTTON), game::user_input::did_jump_interrupt, RISING);
-
 
 }
 

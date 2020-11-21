@@ -75,3 +75,7 @@ https://thesolaruniverse.wordpress.com/2017/08/11/an-128x64-graphic-lcd-display-
 https://adafruit.github.io/Adafruit_SSD1306/html/class_adafruit___s_s_d1306.html#a2661e6166a7a1c00695ed55eaa4ece46
 
 Use a box collider implementation: http://www.cplusplus.com/forum/beginner/167138/
+
+
+Some cool fonts:
+https://github.com/olikraus/u8g2/wiki/fntlistall#92-pixel-height

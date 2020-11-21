@@ -120,8 +120,13 @@ namespace game {
 
     struct Player: public GameObject
     {
-        timestamp_t animation_schedule;
-        uint8_t animation_frame_selector;
+        //struct
+        //{
+            timestamp_t animation_schedule;
+            uint8_t animation_frame_selector;
+            bool airborn;
+        //} player_state;
+
         void start() override;
         void physics_update(const float &delta_time) override;
         void render() override;
@@ -157,6 +162,7 @@ namespace game {
         Player* expose_player() { return &player; }
         #endif
     };
+
 }
 
 #endif
