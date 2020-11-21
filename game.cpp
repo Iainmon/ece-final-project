@@ -12,7 +12,7 @@ game::GameObject::GameObject() {
 }
 
 game::SceneController::SceneController() {
-    for (int i = 0; i < MAX_OBSTACLES; i++) {
+    for (byte_t i = 0; i < MAX_OBSTACLES; ++i) {
         scene_obstacles[i] = game::Obstacle();
         scene_objects[i] = &scene_obstacles[i];
     }
@@ -29,7 +29,7 @@ void game::SceneController::game_over()
 void game::SceneController::start_scene()
 {
     last_step_time = millis();
-    for (int i = 0; i < TOTAL_GAME_OBJECTS; i++) {
+    for (byte_t i = 0; i < TOTAL_GAME_OBJECTS; ++i) {
         scene_objects[i]->start();
     }
 }
@@ -41,15 +41,17 @@ void game::SceneController::step_scene()
         return;
     }
 
-    unsigned long current_time = millis();
-    unsigned long l_dt = current_time - last_step_time;
+    timestamp_t current_time = millis();
+    game::game_state::life_time = current_time;
+    
+    timestamp_t l_dt = current_time - last_step_time;
     float delta_time = (float)l_dt / 1000.0; // I want those seconds
 
-    for (int i = 0; i < TOTAL_GAME_OBJECTS; i++) {
+    for (byte_t i = 0; i < TOTAL_GAME_OBJECTS; ++i) {
         scene_objects[i]->physics_update(delta_time);
     }
 
-    for (int i = 0; i < MAX_OBSTACLES; i++) {
+    for (byte_t i = 0; i < MAX_OBSTACLES; ++i) {
         if (game::objects_intersecting(&player, &scene_obstacles[i])) {
             game_is_over = true;
             break;
@@ -61,7 +63,7 @@ void game::SceneController::step_scene()
 
 void game::SceneController::render()
 {
-    for (int i = 0; i < TOTAL_GAME_OBJECTS; i++) {
+    for (byte_t i = 0; i < TOTAL_GAME_OBJECTS; ++i) {
         scene_objects[i]->render();
     }
 }
@@ -100,11 +102,11 @@ bool game::objects_intersecting(game::GameObject* obj_a, game::GameObject* obj_b
 
 void game::Player::start()
 {
-    collider.top    =  1.0;
-    collider.bottom = -1.0;
-    collider.right  =  1.0;
-    collider.left   = -1.0;
-    pos.x = 50.0;
+    collider.top    =  6.0;
+    collider.bottom =  0.0;
+    collider.right  =  0.1;
+    collider.left   = -0.1;
+    pos.x = 100.0;
     pos.y = 0.0;
 }
 
@@ -132,6 +134,7 @@ void game::Player::physics_update(const float &delta_time)
 
     constexpr float max_axis_movement_speed = 20.0;
     vel.y = constrain(vel.y, -max_axis_movement_speed, max_axis_movement_speed);
+    // vel.x = constrain(vel.x, -max_axis_movement_speed, max_axis_movement_speed);
 
 
     // This the velocity to zero when the distance between player and the ground approches zero.
@@ -147,7 +150,18 @@ void game::Player::render()
 {
     // Execute the render calls
 
-    game::graphics::draw_box(pos.x, pos.y, 3, 3);
+    // game::graphics::draw_box(pos.x, pos.y, 3, 3);
+
+    constexpr float animation_durration_seconds = 0.2;
+    constexpr unsigned long animation_durration_millis = (unsigned long)(1000.0 * animation_durration_seconds);
+
+    if (animation_schedule < game::game_state::life_time) {
+        ++animation_frame_selector;
+        animation_frame_selector %= 2;
+        animation_schedule = game::game_state::life_time + animation_durration_millis;
+    }
+
+    game::graphics::draw_bitmap(pos.x, pos.y, 1, 12, game::graphics::sprites::person_run_frames[animation_frame_selector]);
 }
 
 
@@ -159,10 +173,10 @@ void game::Obstacle::start()
     collider.left   = -5.0;
 
 
-    pos.y = (float)random(0, 64);
-    pos.x = (float)random(-10, 10);
+    pos.y = (float)random(0, 30);
+    pos.x = (float)random(-30, 0);
 
-    constexpr float obstacle_speed = 10.0;
+    constexpr float obstacle_speed = 30.0;
     vel.x = obstacle_speed;
 }
 
@@ -183,6 +197,8 @@ void game::Obstacle::respawn()
 void game::Obstacle::render() 
 {
     // Execute the render calls
-    game::graphics::draw_frame(pos.x, pos.y, 6, 6);
+    constexpr uint16_t snowman_glyph_addy = 0x2603;
+    game::graphics::draw_frame(pos.x, pos.y, 8, 8);
+    // game::graphics::draw_glyph(pos.x, pos.y, snowman_glyph_addy);
 }
 

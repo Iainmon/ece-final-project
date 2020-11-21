@@ -8,11 +8,17 @@
 
 #define DEBUG_MODE 1
 
+using timestamp_t = unsigned long;
+
 #ifndef ARDUINO_H
-unsigned long millis();
+timestamp_t millis();
 long random(long, long);
 long random();
+typedef unsigned char byte;
+typedef unsigned char unit8_t;
 #endif
+
+typedef unsigned char byte_t;
 
 namespace game {
 
@@ -32,6 +38,10 @@ namespace game {
 
         #include "graphics.h"
         using namespace graphics_implementation;
+    }
+
+    namespace game_state {
+        volatile static timestamp_t life_time;
     }
 
     template<typename T>
@@ -110,6 +120,8 @@ namespace game {
 
     struct Player: public GameObject
     {
+        timestamp_t animation_schedule;
+        uint8_t animation_frame_selector;
         void start() override;
         void physics_update(const float &delta_time) override;
         void render() override;
@@ -125,7 +137,7 @@ namespace game {
 
     bool objects_intersecting(GameObject* obj_a, GameObject* obj_b);
 
-    #define MAX_OBSTACLES 6
+    #define MAX_OBSTACLES 3
     #define TOTAL_GAME_OBJECTS MAX_OBSTACLES+1
 
     class SceneController
