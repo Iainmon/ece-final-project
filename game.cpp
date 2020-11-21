@@ -20,18 +20,10 @@ game::SceneController::SceneController() {
     scene_objects[TOTAL_GAME_OBJECTS - 1] = &player;
 }
 
-bool game::SceneController::player_did_collide() {
-    for (int i = 0; i < MAX_OBSTACLES; i++) {
-        if (player.pos == scene_objects[i]->pos) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void game::SceneController::game_over() {
+void game::SceneController::game_over()
+{
     // TODO: render some animation and give controll back to UI
-    while (true) {void;}
+    game::graphics::draw_string(100, 20, "GAME OVER!");
 }
 
 void game::SceneController::start_scene()
@@ -44,6 +36,10 @@ void game::SceneController::start_scene()
 
 void game::SceneController::step_scene()
 {
+    if (game_is_over) {
+        game_over();
+        return;
+    }
 
     unsigned long current_time = millis();
     unsigned long l_dt = current_time - last_step_time;
@@ -53,7 +49,21 @@ void game::SceneController::step_scene()
         scene_objects[i]->physics_update(delta_time);
     }
 
+    for (int i = 0; i < MAX_OBSTACLES; i++) {
+        if (game::objects_intersecting(&player, &scene_obstacles[i])) {
+            game_is_over = true;
+            break;
+        }
+    }
+
     last_step_time = current_time;
+}
+
+void game::SceneController::render()
+{
+    for (int i = 0; i < TOTAL_GAME_OBJECTS; i++) {
+        scene_objects[i]->render();
+    }
 }
 
 // #ifndef ARDUINO_H
@@ -94,61 +104,85 @@ void game::Player::start()
     collider.bottom = -1.0;
     collider.right  =  1.0;
     collider.left   = -1.0;
+    pos.x = 50.0;
+    pos.y = 0.0;
 }
 
 void game::Player::physics_update(const float &delta_time)
 {
-    Vector2<float> gravity_force = Vector2<float>(0.0, -0.8);
-    Vector2<float> jump_force    = Vector2<float>(0.0, 2.0);
+    Vector2<float> gravity_force = Vector2<float>(0.0, -10.0);
+    Vector2<float> jump_force    = Vector2<float>(0.0, 6.0);
 
     Vector2<float> ground = Vector2<float>(0.0, 0.0);
 
-    pos += vel * delta_time;
-    vel += gravity_force * delta_time;
-    if (game::user_input::did_jump()) { // This should happen in the scene controller
+    if (game::user_input::jump) { // This should happen in the scene controller
         vel += jump_force;
+        game::user_input::jump = false;
     }
 
-    // This the velocity to zero when the distance between player and the ground approches zero.
-    Vector2<float> ground_diff = ground - pos;
-    const float ground_diff_threshold = 0.15;
-    if (abs(ground_diff.y) > ground_diff_threshold) {
-        vel.y = 0;
-        pos.y = 0;
+    pos += vel * delta_time;
+
+
+    if (pos.y > 0.2) {
+        vel += gravity_force * delta_time; // gravity_force;
+    } else if (pos.y < 0.0) {
+        vel.y = 0.0;
+        pos.y = 0.0;
     }
+
+    constexpr float max_axis_movement_speed = 20.0;
+    vel.y = constrain(vel.y, -max_axis_movement_speed, max_axis_movement_speed);
+
+
+    // This the velocity to zero when the distance between player and the ground approches zero.
+    // Vector2<float> ground_diff = ground - pos;
+    // const float ground_diff_threshold = 0.15;
+    // if (abs(ground_diff.y) > ground_diff_threshold) {
+    //     vel.y = 0;
+    //     pos.y = 0;
+    // }
 }
 
 void game::Player::render()
 {
     // Execute the render calls
+
+    game::graphics::draw_box(pos.x, pos.y, 3, 3);
 }
 
 
 void game::Obstacle::start()
 {
-    collider.top    =  1.0;
-    collider.bottom = -1.0;
-    collider.right  =  1.0;
-    collider.left   = -1.0;
+    collider.top    =  5.0;
+    collider.bottom = -5.0;
+    collider.right  =  5.0;
+    collider.left   = -5.0;
 
-    vel.x = -1.0;
+
+    pos.y = (float)random(0, 64);
+    pos.x = (float)random(-10, 10);
+
+    constexpr float obstacle_speed = 10.0;
+    vel.x = obstacle_speed;
 }
 
 void game::Obstacle::physics_update(const float &delta_time)
 {
-    if (pos.x < -2.0) {
+    if (pos.x > 150.0) {
         respawn();
     }
+    pos += vel * delta_time;
 }
 
 void game::Obstacle::respawn()
 {
-    pos.x = 10.0; // Should be random
+    pos.y = (float)random(0, 64);
+    pos.x = (float)random(0, 10);
 }
 
 void game::Obstacle::render() 
 {
     // Execute the render calls
+    game::graphics::draw_frame(pos.x, pos.y, 6, 6);
 }
-
 

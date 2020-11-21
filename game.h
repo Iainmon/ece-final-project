@@ -6,21 +6,23 @@
 #ifndef GAME_H
 #define GAME_H
 
+#define DEBUG_MODE 1
+
 #ifndef ARDUINO_H
 unsigned long millis();
-long random(int, int);
+long random(long, long);
 long random();
-#endif
-
-#ifdef ARDUINO_H
-inline float frandom() { return random(1, 500) / 100.0; }
 #endif
 
 namespace game {
 
+    inline float frandom() { return random(1, 500) / 100.0; }
+    
     namespace user_input {
-        bool did_jump();
-        bool did_squat();
+        void did_jump_interrupt();
+        void did_squat_interrupt();
+        volatile static bool jump = false;
+        volatile static bool squat = false;
     }
 
     namespace graphics {
@@ -28,6 +30,8 @@ namespace game {
         // The screen we will use is 20x4 digits.
         // The memory required to store a screen state is 3200 bits (3.2Kb) which is 400 bytes.
 
+        #include "graphics.h"
+        using namespace graphics_implementation;
     }
 
     template<typename T>
@@ -130,12 +134,16 @@ namespace game {
         Obstacle scene_obstacles[MAX_OBSTACLES];
         GameObject* scene_objects[MAX_OBSTACLES + 1];
         unsigned long last_step_time;
-        bool player_did_collide();
         void game_over();
+        bool game_is_over = false;
         public:
         SceneController();
         void start_scene();
         void step_scene();
+        void render();
+        #if DEBUG_MODE
+        Player* expose_player() { return &player; }
+        #endif
     };
 }
 
