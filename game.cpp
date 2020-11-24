@@ -24,12 +24,13 @@ void game::SceneController::game_over()
 {
     // TODO: render some animation and give controll back to UI
     game::graphics::draw_string(120, 60, "GAME");
-    game::graphics::draw_string(120, 40, "OVER!");
+    game::graphics::draw_string(120, 40, "OVER");
 
 }
 
 void game::SceneController::start_scene()
 {
+    game_is_over = false;
     last_step_time = millis();
     for (byte_t i = 0; i < TOTAL_GAME_OBJECTS; ++i) {
         scene_objects[i]->start();
@@ -43,18 +44,21 @@ void game::SceneController::step_scene()
     timestamp_t l_dt = current_time - last_step_time;
     float delta_time = (float)l_dt / 1000.0; // I want those seconds
 
-    // char buf[8];
-    // char buff[20];
-    // float in = delta_time;//* 1000.0f;
-    // sprintf(buf, dtostrf(in, 8, 5, "%f\0" ));
-    // sprintf(buff, "FPS: %s", buf);
-    // game::graphics::debug_draw_string(80, 60, buff);
+    // This is so slow
+    // if (millis() % 500 == 0) {
+        // char buf[8];
+        // char buff[20];
+        // float in = delta_time * 1000.0f * 1000.0f;
+        // sprintf(buf, dtostrf(in, 8, 5, "0%f\0" ));
+        // sprintf(buff, "FPS: %s", buf);
+        // game::graphics::debug_draw_string(80, 60, buff);
+    // }
 
 
     if (game_is_over) {
         if (next_game_schedule < current_time) {
-            step_scene();
-            game_is_over = false;
+            start_scene();
+            return;
         }
         last_step_time = current_time; // Still update delta time. Things are still rendered at game over.
         return;
@@ -123,9 +127,9 @@ bool game::objects_intersecting(game::GameObject* obj_a, game::GameObject* obj_b
 void game::Player::start()
 {
     collider.top    =  12.0;
-    collider.bottom =  4.0;
-    collider.right  =  1.0;
-    collider.left   =  2.0;
+    collider.bottom =  2.0;
+    collider.right  =  2.0;
+    collider.left   =  5.0;
     pos.x = 120.0;
     pos.y = 0.0;
 
@@ -156,7 +160,7 @@ void game::Player::physics_update(const float &delta_time)
             game::user_input::squat = false;
             run();
         }
-        
+
         // Normal jump functionality
         jump();
         game::user_input::jump = false;
@@ -203,7 +207,7 @@ void game::Player::jump()
 void game::Player::squat()
 {
     if (action_markov == jogging) {
-        collider.top -= 4.0;
+        collider.top = 10.0;
         action_markov = ducking;
     }
 }
@@ -239,8 +243,7 @@ void game::Obstacle::start()
     collider.left   =  5.5;
 
 
-    pos.y = (float)random(0, 30);
-    pos.x = (float)random(-30, 0);
+    respawn();
 
     constexpr float obstacle_speed = 30.0;
     vel.x = obstacle_speed;
@@ -251,13 +254,15 @@ void game::Obstacle::physics_update(const float &delta_time)
     if (pos.x > 150.0) {
         respawn();
     }
+    vel.y += sin(pos.x * 8.) * 2.0;
     pos += vel * delta_time;
 }
 
 void game::Obstacle::respawn()
 {
-    pos.y = (float)random(0, 64);
-    pos.x = (float)random(0, 10);
+    pos.y = (float)random(6, 70);
+    pos.x = (float)random(-64, 0);
+    vel.y = 0.;
 }
 
 void game::Obstacle::render() 

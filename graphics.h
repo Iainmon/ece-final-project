@@ -1,3 +1,7 @@
+// ---------------------------------------------
+// Created by Iain Moncrief on November 13, 2020
+// Arduino Game - game.cpp
+// ---------------------------------------------
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
@@ -7,6 +11,7 @@
 namespace graphics_implementation {
 
     typedef Adafruit_SSD1306 OLED_Display;
+    typedef U8G2_ST7920_128X64_1_SW_SPI LCD_Display;
 
     #define SCREEN_WIDTH 128 // OLED display width, in pixels
     #define SCREEN_HEIGHT 32 // OLED display height, in pixels
@@ -15,7 +20,7 @@ namespace graphics_implementation {
 
 
     static OLED_Display mini_display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-    static U8G2_ST7920_128X64_1_SW_SPI u8g2(/*rotation = U8G2_R0*/ U8G2_R2, /* clock=*/ 13, /* data=*/ 11, /* CS=*/ 12, /* reset=*/ 8);
+    static LCD_Display u8g2(/*rotation = U8G2_R0*/ U8G2_R2, /* clock=*/ 13, /* data=*/ 11, /* CS=*/ 12, /* reset=*/ 8);
 
     #define DEFAULT_FONT_MODE u8g2_font_tenstamps_mu // u8g2_font_6x10_tf;
     #define DEBUG_FONT_MODE u8g2_font_5x8_mf

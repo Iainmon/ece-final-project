@@ -167,6 +167,11 @@ namespace game {
         #endif
     };
 
+    // struct StatusScreen
+    // {
+
+    // };
+
 }
 
 #endif

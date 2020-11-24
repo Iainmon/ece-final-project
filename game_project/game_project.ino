@@ -15,7 +15,8 @@ void game::user_input::did_jump_interrupt() {
 }
 
 void game::user_input::did_squat_interrupt() {
-    game::user_input::squat = !game::user_input::squat;
+    // game::user_input::squat = !game::user_input::squat;
+    game::user_input::squat = digitalRead(SQUAT_BUTTON);
 }
 
 static game::SceneController game_scene;
