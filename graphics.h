@@ -235,14 +235,18 @@ namespace graphics_implementation {
         }
         inline void format_sprites()
         {
-            reverse_array(person_run_frames[0], 0, 12);
-            reverse_all_bytes(person_run_frames[0], 12);
-            reverse_array(person_run_frames[1], 0, 12);
-            reverse_all_bytes(person_run_frames[1], 12);
-            reverse_array(person_run_frames[2], 0, 12);
-            reverse_all_bytes(person_run_frames[2], 12);
-            reverse_array(person_run_frames[3], 0, 12);
-            reverse_all_bytes(person_run_frames[3], 12);
+            for (unit8_t i = 0; i < 4; ++i) {
+                reverse_array(person_run_frames[i], 0, 12);
+                reverse_all_bytes(person_run_frames[i], 12);
+            }
+            // reverse_array(person_run_frames[0], 0, 12);
+            // reverse_all_bytes(person_run_frames[0], 12);
+            // reverse_array(person_run_frames[1], 0, 12);
+            // reverse_all_bytes(person_run_frames[1], 12);
+            // reverse_array(person_run_frames[2], 0, 12);
+            // reverse_all_bytes(person_run_frames[2], 12);
+            // reverse_array(person_run_frames[3], 0, 12);
+            // reverse_all_bytes(person_run_frames[3], 12);
         }
     }
 }

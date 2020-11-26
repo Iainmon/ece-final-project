@@ -5,6 +5,7 @@
 
 #include "game.h"
 
+#define noinline __attribute__((noinline))
 
 game::GameObject::GameObject() {
     pos.x = -1; pos.y = -1;
@@ -105,12 +106,12 @@ bool game::objects_intersecting(game::GameObject* obj_a, game::GameObject* obj_b
     // || b2.top < b1.bottom // b2 below b1
     // || b1.right < b2.left // b2 to the right of b1
     // || b2.right < b1.left
-    game::RelativeCollider<float> a;
+    static game::RelativeCollider<float> a;
         a.top    = obj_a->pos.y + obj_a->collider.top;
         a.bottom = obj_a->pos.y + obj_a->collider.bottom;
         a.left   = obj_a->pos.x + obj_a->collider.left;
         a.right  = obj_a->pos.x + obj_a->collider.right;
-    game::RelativeCollider<float> b;
+    static game::RelativeCollider<float> b;
         b.top    = obj_b->pos.y + obj_b->collider.top;
         b.bottom = obj_b->pos.y + obj_b->collider.bottom;
         b.left   = obj_b->pos.x + obj_b->collider.left;
@@ -138,7 +139,7 @@ void game::Player::start()
 
 void game::Player::physics_update(const float &delta_time)
 {
-    Vector2<float> gravity_force = Vector2<float>(0.0, -20.0);
+    Vector2<float> gravity_force = Vector2<float>(0.0, -25.0);
 
     // if (action_markov == jogging) {
     //     if (game::user_input::jump) {
@@ -166,7 +167,7 @@ void game::Player::physics_update(const float &delta_time)
         game::user_input::jump = false;
     } else if (game::user_input::squat) {
         squat();
-    } else if (action_markov != airborn && !game::user_input::squat) {
+    } else if (action_markov != airborn && action_markov != jogging) {
         run();
     }
 
@@ -184,7 +185,7 @@ void game::Player::physics_update(const float &delta_time)
     // vel.x = constrain(vel.x, -max_axis_movement_speed, max_axis_movement_speed);
 }
 
-void game::Player::run()
+noinline void game::Player::run()
 {
     //if () {
         vel.y = 0.0;
