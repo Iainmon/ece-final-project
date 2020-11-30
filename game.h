@@ -42,6 +42,7 @@ namespace game {
 
     namespace game_state {
         volatile static timestamp_t life_time;
+        volatile static byte_t score;
     }
 
     template<typename T>
@@ -143,16 +144,29 @@ namespace game {
         void respawn();
     };
 
+    struct Reward : public GameObject
+    {
+        bool is_passing;
+        void start() override;
+        void physics_update(const float &delta_time) override;
+        void render() override;
+        void respawn();
+        void player_gotcha();
+    };
+    
+
     bool objects_intersecting(GameObject* obj_a, GameObject* obj_b);
 
     #define MAX_OBSTACLES 4
-    #define TOTAL_GAME_OBJECTS MAX_OBSTACLES+1
+    #define MAX_REWARDS 3
+    #define TOTAL_GAME_OBJECTS (MAX_OBSTACLES+MAX_REWARDS+1)
 
     class SceneController
     {
         Player player;
         Obstacle scene_obstacles[MAX_OBSTACLES];
-        GameObject* scene_objects[MAX_OBSTACLES + 1];
+        Reward scene_reward_tokens[MAX_REWARDS];
+        GameObject* scene_objects[TOTAL_GAME_OBJECTS];
         unsigned long last_step_time;
         void game_over();
         bool game_is_over = false;

@@ -76,6 +76,7 @@ https://adafruit.github.io/Adafruit_SSD1306/html/class_adafruit___s_s_d1306.html
 
 Use a box collider implementation: http://www.cplusplus.com/forum/beginner/167138/
 
+https://www.amazon.com/review/RFAAUKV02UXD6/ref=cm_cr_srp_d_rdp_perm?ASIN=B00O2LLT30
 
 Some cool fonts:
 https://github.com/olikraus/u8g2/wiki/fntlistall#92-pixel-height

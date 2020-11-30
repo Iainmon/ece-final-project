@@ -5,7 +5,7 @@
 
 #include "game.h"
 
-#define noinline __attribute__((noinline))
+#define noinline __attribute__((noinline)) \
 
 game::GameObject::GameObject() {
     pos.x = -1; pos.y = -1;
@@ -16,6 +16,11 @@ game::SceneController::SceneController() {
     for (byte_t i = 0; i < MAX_OBSTACLES; ++i) {
         scene_obstacles[i] = game::Obstacle();
         scene_objects[i] = &scene_obstacles[i];
+    }
+    for (byte_t i = 0; i < MAX_REWARDS; ++i) {
+        scene_reward_tokens[i] = game::Reward();
+        const byte_t offset_index = MAX_OBSTACLES + i;
+        scene_objects[offset_index] = &scene_reward_tokens[i];
     }
     player = game::Player();
     scene_objects[TOTAL_GAME_OBJECTS - 1] = &player;
@@ -77,6 +82,12 @@ void game::SceneController::step_scene()
             constexpr timestamp_t game_over_delay = game_over_delay_seconds * 1000;
             next_game_schedule = current_time + game_over_delay;
             break;
+        }
+    }
+
+    for (byte_t i = 0; i < MAX_REWARDS; ++i) {
+        if (game::objects_intersecting(&player, &scene_reward_tokens[i])) {
+            scene_reward_tokens[i].player_gotcha();
         }
     }
 
@@ -165,7 +176,7 @@ void game::Player::physics_update(const float &delta_time)
         // Normal jump functionality
         jump();
         game::user_input::jump = false;
-    } else if (game::user_input::squat) {
+    } else if (action_markov != airborn && game::user_input::squat) {
         squat();
     } else if (action_markov != airborn && action_markov != jogging) {
         run();
@@ -275,3 +286,45 @@ void game::Obstacle::render()
     game::graphics::draw_glyph(pos.x - 6.0f, pos.y + 6.0f, box_glyph_addy); // Glyphs draw differently
 }
 
+void game::Reward::start()
+{
+    collider.top    =  8.5;
+    collider.bottom =  0.0;
+    collider.right  = -8.5;
+    collider.left   =  8.5;
+
+    pos.y = 10;
+    pos.x = 10;
+    vel.x = 20.0;
+    is_passing = true;
+    respawn();
+}
+
+void game::Reward::physics_update(const float &delta_time)
+{
+    // if (!is_passing) { return; }
+    
+    if (pos.x > 150.0) {
+        respawn();
+    }
+
+    pos += vel * delta_time;
+}
+
+void game::Reward::respawn()
+{
+    pos.y = (float)random(6, 70);
+    pos.x = (float)random(-64, 0);
+    vel.y = 0.;
+}
+
+void game::Reward::player_gotcha()
+{
+    game::game_state::score += 1;
+    respawn();
+}
+
+void game::Reward::render()
+{
+    game::graphics::draw_bitmap(pos.x - 8.0f, pos.y - 8.0f, 2, 16, game::graphics::sprites::reward_frames);
+}

@@ -14,12 +14,14 @@ namespace graphics_implementation {
     typedef U8G2_ST7920_128X64_1_SW_SPI LCD_Display;
 
     #define SCREEN_WIDTH 128 // OLED display width, in pixels
-    #define SCREEN_HEIGHT 32 // OLED display height, in pixels
+    #define SCREEN_HEIGHT 64 // OLED display height, in pixels
     // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
     #define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
+    #define OLED_ADDY 0x3C
 
 
     static OLED_Display mini_display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+    // static OLED_Display mini_display(SCREEN_WIDTH, SCREEN_HEIGHT);
     static LCD_Display u8g2(/*rotation = U8G2_R0*/ U8G2_R2, /* clock=*/ 13, /* data=*/ 11, /* CS=*/ 12, /* reset=*/ 8);
 
     #define DEFAULT_FONT_MODE u8g2_font_tenstamps_mu // u8g2_font_6x10_tf;
@@ -33,11 +35,19 @@ namespace graphics_implementation {
         u8g2.setBitmapMode(1);
         u8g2.setFontPosTop();
         u8g2.setFontDirection(2); // 180 deg rotation
+
+        // mini_display.clearDisplay();
+        //mini_display.drawTriangle(63, 0, 0, 63, 127, 63, WHITE);
+    }
+
+    void post_update() {
+        mini_display.display();
     }
 
     void initialize_screens()
     {
         u8g2.begin();
+        mini_display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDY);
     }
 
     inline void draw_box(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t h)
@@ -110,7 +120,6 @@ namespace graphics_implementation {
     {
         u8g2.drawBitmap(x, y, cnt, h, bitmap);
     }
-
 
     namespace messages {
         const static char game_over_1[] = {"GAME"};
@@ -206,6 +215,41 @@ namespace graphics_implementation {
         }
         };
 
+        static const byte_t reward_frames[32] = {
+            // B00000001, B10000000,
+            // B00000010, B01000000,
+            // B00000010, B01000000,
+            // B00000100, B00100000,
+            // B11111100, B00111111,
+            // B10000000, B00000001,
+            // B01000010, B01000010,
+            // B00100010, B01000100,
+            // B00010010, B01001000,
+            // B00010000, B00001000,
+            // B00100000, B00000100,
+            // B00100000, B00000100,
+            // B01000001, B10000010,
+            // B01000110, B01100010,
+            // B10011000, B00011001,
+            // B11100000, B00000111,
+            B00000001, B10000000,
+            B00000010, B01000000,
+            B00000010, B01000000,
+            B00000100, B00100000,
+            B11111100, B00111111,
+            B10000000, B00000001,
+            B01000010, B01000010,
+            B00100010, B01000100,
+            B00010010, B01001000,
+            B00010000, B00001000,
+            B00100000, B00000100,
+            B00100000, B00000100,
+            B01000001, B10000010,
+            B01000110, B01100010,
+            B10011000, B00011001,
+            B11100000, B00000111,
+        }; // 16x16
+
         // 
         // This is monkey code.
         // 
@@ -218,6 +262,7 @@ namespace graphics_implementation {
         }
         inline void reverse_array(byte_t arr[], byte_t start, byte_t end)
         {
+            end--;
             while (start < end)
             {
                 byte_t temp = arr[start];
@@ -233,12 +278,43 @@ namespace graphics_implementation {
                 array[i] = reverse_byte(array[i]);
             }
         }
+        #define MAX_REORDER_BUFFER_SIZE 32
+        inline void mitosis_anaphase_reorder(byte_t array[], byte_t n)
+        {
+            byte_t buffer[MAX_REORDER_BUFFER_SIZE];
+            byte_t next_index = 0;
+            for (byte_t i = 0; i < n; i += 2) {
+                buffer[next_index] = array[i];
+                ++next_index;
+            }
+            for (byte_t j = 1; j < n; j += 2) {
+                buffer[next_index] = array[j];
+                ++next_index;
+            }
+            for (byte_t k = 0; k < n; ++k) {
+                array[k] = buffer[k];
+            }
+        }
+        inline void inverse_mitosis_anaphase_reorder(byte_t array[], byte_t n)
+        {
+            byte_t temp;
+            for (byte_t i = 0; i < n-1; ++i) {
+                temp = i;
+            }
+        }
         inline void format_sprites()
         {
             for (unit8_t i = 0; i < 4; ++i) {
                 reverse_array(person_run_frames[i], 0, 12);
                 reverse_all_bytes(person_run_frames[i], 12);
             }
+
+            // mitosis_anaphase_reorder(reward_frames, 32);
+            // reverse_array(reward_frames, 0, 32);
+            // mitosis_anaphase_reorder(reward_frames, 32);
+            reverse_array(reward_frames, 0, 32);
+            reverse_all_bytes(reward_frames, 32);
+            
             // reverse_array(person_run_frames[0], 0, 12);
             // reverse_all_bytes(person_run_frames[0], 12);
             // reverse_array(person_run_frames[1], 0, 12);
