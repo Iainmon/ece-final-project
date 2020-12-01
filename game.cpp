@@ -5,8 +5,6 @@
 
 #include "game.h"
 
-#define noinline __attribute__((noinline)) \
-
 game::GameObject::GameObject() {
     pos.x = -1; pos.y = -1;
     // vel.x = 0; vel.y = 0;
@@ -88,7 +86,23 @@ void game::SceneController::step_scene()
     for (byte_t i = 0; i < MAX_REWARDS; ++i) {
         if (game::objects_intersecting(&player, &scene_reward_tokens[i])) {
             scene_reward_tokens[i].player_gotcha();
+            ++player.score;
         }
+    }
+
+    if (next_mini_display_render < current_time) {
+        game::graphics::mini_display.clearDisplay();
+        // game::graphics::mini_display.drawTriangle((int)(30 + 10*sin(0.02f * (float)current_time)), 0, 0, 63, 127, 63, WHITE);
+
+        game::graphics::mini_display.setCursor(10,0);
+        game::graphics::mini_display.setTextSize(2);
+        game::graphics::mini_display.setTextWrap(false);
+        game::graphics::mini_display.setTextColor(SSD1306_WHITE);
+        game::graphics::mini_display.println(F(""));
+        game::graphics::mini_display.print(F("Score: "));
+        game::graphics::mini_display.print(player.score);
+        game::graphics::draw_mini_display();
+        next_mini_display_render = current_time + 200;
     }
 
     last_step_time = current_time;
@@ -146,6 +160,8 @@ void game::Player::start()
     pos.y = 0.0;
 
     action_markov = jogging;
+
+    score = 0;
 }
 
 void game::Player::physics_update(const float &delta_time)

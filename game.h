@@ -20,6 +20,8 @@ typedef unsigned char unit8_t;
 
 typedef unsigned char byte_t;
 
+#define noinline __attribute__((noinline)) \
+
 namespace game {
 
     inline float frandom() { return random(1, 500) / 100.0; }
@@ -123,10 +125,10 @@ namespace game {
     {
         enum StateMarkov {jogging, airborn, ducking} action_markov;
 
+        byte_t score;
+
         timestamp_t animation_schedule;
         uint8_t animation_frame_selector;
-        // bool airborn;
-        // bool ducking;
         inline void jump();
         inline void squat();
         inline void run();
@@ -171,6 +173,7 @@ namespace game {
         void game_over();
         bool game_is_over = false;
         timestamp_t next_game_schedule;
+        timestamp_t next_mini_display_render;
         public:
         SceneController();
         void start_scene();

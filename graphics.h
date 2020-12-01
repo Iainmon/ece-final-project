@@ -10,11 +10,15 @@
 
 namespace graphics_implementation {
 
+    namespace schedule {
+        static bool redraw_mini_display = true;
+    }
+
     typedef Adafruit_SSD1306 OLED_Display;
     typedef U8G2_ST7920_128X64_1_SW_SPI LCD_Display;
 
     #define SCREEN_WIDTH 128 // OLED display width, in pixels
-    #define SCREEN_HEIGHT 64 // OLED display height, in pixels
+    #define SCREEN_HEIGHT 32 // OLED display height, in pixels
     // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
     #define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
     #define OLED_ADDY 0x3C
@@ -27,7 +31,7 @@ namespace graphics_implementation {
     #define DEFAULT_FONT_MODE u8g2_font_tenstamps_mu // u8g2_font_6x10_tf;
     #define DEBUG_FONT_MODE u8g2_font_5x8_mf
 
-    void pre_update()
+    inline void pre_update()
     {
         u8g2.setFont(DEFAULT_FONT_MODE);
         u8g2.setFontRefHeightExtendedText();
@@ -36,18 +40,23 @@ namespace graphics_implementation {
         u8g2.setFontPosTop();
         u8g2.setFontDirection(2); // 180 deg rotation
 
-        // mini_display.clearDisplay();
-        //mini_display.drawTriangle(63, 0, 0, 63, 127, 63, WHITE);
     }
 
-    void post_update() {
-        mini_display.display();
+    inline void post_update() {
+        if (schedule::redraw_mini_display) {
+            mini_display.display();
+            schedule::redraw_mini_display = false;
+        }
+    }
+
+    void draw_mini_display() {
+        schedule::redraw_mini_display = true;
     }
 
     void initialize_screens()
     {
         u8g2.begin();
-        mini_display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDY);
+        mini_display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     }
 
     inline void draw_box(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t h)
