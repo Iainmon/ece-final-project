@@ -34,10 +34,6 @@ namespace game {
     }
 
     namespace graphics {
-        // Each digit spot is 5x8 binary pixels. 
-        // The screen we will use is 20x4 digits.
-        // The memory required to store a screen state is 3200 bits (3.2Kb) which is 400 bytes.
-
         #include "graphics.h"
         using namespace graphics_implementation;
     }
@@ -183,12 +179,6 @@ namespace game {
         Player* expose_player() { return &player; }
         #endif
     };
-
-    // struct StatusScreen
-    // {
-
-    // };
-
 }
 
 #endif

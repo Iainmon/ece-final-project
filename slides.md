@@ -1,7 +1,7 @@
 ```cpp
 void game::Player::physics_update(const float &delta_time)
 {
-    Vector<2, float> gravity_force = Vector<2, float>(0.0, -25.0);
+    Vector2<float> gravity_force = Vector<2, float>(0.0, -25.0);
 
     if (game::user_input::jump) {
         // Markov solution for edge 'e'

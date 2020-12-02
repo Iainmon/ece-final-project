@@ -48,17 +48,6 @@ void game::SceneController::step_scene()
     timestamp_t l_dt = current_time - last_step_time;
     float delta_time = (float)l_dt / 1000.0; // I want those seconds
 
-    // This is so slow
-    // if (millis() % 500 == 0) {
-        // char buf[8];
-        // char buff[20];
-        // float in = delta_time * 1000.0f * 1000.0f;
-        // sprintf(buf, dtostrf(in, 8, 5, "0%f\0" ));
-        // sprintf(buff, "FPS: %s", buf);
-        // game::graphics::debug_draw_string(80, 60, buff);
-    // }
-
-
     if (game_is_over) {
         if (next_game_schedule < current_time) {
             start_scene();
@@ -92,8 +81,6 @@ void game::SceneController::step_scene()
 
     if (next_mini_display_render < current_time) {
         game::graphics::mini_display.clearDisplay();
-        // game::graphics::mini_display.drawTriangle((int)(30 + 10*sin(0.02f * (float)current_time)), 0, 0, 63, 127, 63, WHITE);
-
         game::graphics::mini_display.setCursor(10,0);
         game::graphics::mini_display.setTextSize(2);
         game::graphics::mini_display.setTextWrap(false);
@@ -214,12 +201,10 @@ void game::Player::physics_update(const float &delta_time)
 
 noinline void game::Player::run()
 {
-    //if () {
-        vel.y = 0.0;
-        pos.y = 0.0;
-        collider.top = 12.0;
-        action_markov = jogging;
-    //}
+    vel.y = 0.0;
+    pos.y = 0.0;
+    collider.top = 12.0;
+    action_markov = jogging;
 }
 
 void game::Player::jump()
@@ -298,7 +283,6 @@ void game::Obstacle::render()
     // Execute the render calls
     // https://github.com/olikraus/u8g2/wiki/fntgrpx11#cursor
     constexpr uint16_t box_glyph_addy = 0x50;
-    // game::graphics::draw_frame(pos.x, pos.y, 8, 8);
     game::graphics::draw_glyph(pos.x - 6.0f, pos.y + 6.0f, box_glyph_addy); // Glyphs draw differently
 }
 
