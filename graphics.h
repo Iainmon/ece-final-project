@@ -1,8 +1,3 @@
-// ---------------------------------------------
-// Created by Iain Moncrief on November 13, 2020
-// Arduino Game - game.cpp
-// ---------------------------------------------
-
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
@@ -19,16 +14,14 @@ namespace graphics_implementation {
 
     #define SCREEN_WIDTH 128 // OLED display width, in pixels
     #define SCREEN_HEIGHT 32 // OLED display height, in pixels
-    // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
     #define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
     #define OLED_ADDY 0x3C
 
 
     static OLED_Display mini_display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-    // static OLED_Display mini_display(SCREEN_WIDTH, SCREEN_HEIGHT);
     static LCD_Display u8g2(/*rotation = U8G2_R0*/ U8G2_R2, /* clock=*/ 13, /* data=*/ 11, /* CS=*/ 12, /* reset=*/ 8);
 
-    #define DEFAULT_FONT_MODE u8g2_font_tenstamps_mu // u8g2_font_6x10_tf;
+    #define DEFAULT_FONT_MODE u8g2_font_tenstamps_mu
     #define DEBUG_FONT_MODE u8g2_font_5x8_mf
 
     inline void pre_update()
@@ -318,20 +311,8 @@ namespace graphics_implementation {
                 reverse_all_bytes(person_run_frames[i], 12);
             }
 
-            // mitosis_anaphase_reorder(reward_frames, 32);
-            // reverse_array(reward_frames, 0, 32);
-            // mitosis_anaphase_reorder(reward_frames, 32);
             reverse_array(reward_frames, 0, 32);
             reverse_all_bytes(reward_frames, 32);
-            
-            // reverse_array(person_run_frames[0], 0, 12);
-            // reverse_all_bytes(person_run_frames[0], 12);
-            // reverse_array(person_run_frames[1], 0, 12);
-            // reverse_all_bytes(person_run_frames[1], 12);
-            // reverse_array(person_run_frames[2], 0, 12);
-            // reverse_all_bytes(person_run_frames[2], 12);
-            // reverse_array(person_run_frames[3], 0, 12);
-            // reverse_all_bytes(person_run_frames[3], 12);
         }
     }
 }

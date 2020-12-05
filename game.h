@@ -1,8 +1,3 @@
-// ---------------------------------------------
-// Created by Iain Moncrief on November 13, 2020
-// Arduino Game - game.h
-// ---------------------------------------------
-
 #ifndef GAME_H
 #define GAME_H
 

@@ -50,11 +50,4 @@ void loop()
         game::graphics::post_update();
 
     } while (game::graphics::non_terminating_refresh());
-
-    //     game::graphics::pre_update();
-    //     game_scene.step_scene();
-    //     game_scene.render();
-
-    // game::graphics::non_terminating_refresh();
-
 }

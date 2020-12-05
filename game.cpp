@@ -1,8 +1,3 @@
-// ---------------------------------------------
-// Created by Iain Moncrief on November 13, 2020
-// Arduino Game - game.cpp
-// ---------------------------------------------
-
 #include "game.h"
 
 game::GameObject::GameObject() {
@@ -26,7 +21,6 @@ game::SceneController::SceneController() {
 
 void game::SceneController::game_over()
 {
-    // TODO: render some animation and give controll back to UI
     game::graphics::draw_string(120, 60, "GAME");
     game::graphics::draw_string(120, 40, "OVER");
 
@@ -155,19 +149,6 @@ void game::Player::physics_update(const float &delta_time)
 {
     Vector2<float> gravity_force = Vector2<float>(0.0, -25.0);
 
-    // if (action_markov == jogging) {
-    //     if (game::user_input::jump) {
-    //         jump();
-    //         game::user_input::jump = false;
-    //     } else if (game::user_input::squat) {
-    //         squat();
-    //         // game::user_input::squat = false;
-    //     }
-    // } else if (action_markov == ducking) {
-    //     if (!game::user_input::squat) {
-    //         run();
-    //     }
-    // }
 
     if (game::user_input::jump) {
         // Markov edge (e) solution
